@@ -16,7 +16,7 @@ class TrainEigenFaces:
         self.path = os.path.join(self.face_dir, self.face_name)
         if not os.path.isdir(self.path):
             os.mkdir(self.path)
-        self.model = cv2.createEigenFaceRecognizer()
+        self.model = cv2.face.createEigenFaceRecognizer()
         self.count_captures = 0
         self.count_timer = 0
 
@@ -37,24 +37,24 @@ class TrainEigenFaces:
 
     def process_image(self, inImg):
         frame = cv2.flip(inImg,1)
-        resized_width, resized_height = (112, 92)        
+        resized_width, resized_height = (112, 92)
         if self.count_captures < NUM_TRAINING:
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) 
-            gray_resized = cv2.resize(gray, (gray.shape[1]/RESIZE_FACTOR, gray.shape[0]/RESIZE_FACTOR))        
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            gray_resized = cv2.resize(gray, (gray.shape[1]/RESIZE_FACTOR, gray.shape[0]/RESIZE_FACTOR))
             faces = self.face_cascade.detectMultiScale(
                 gray_resized,
                 scaleFactor=1.1,
                 minNeighbors=5,
                 minSize=(30, 30),
-                flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+                flags=cv2.CASCADE_SCALE_IMAGE
                 )
             if len(faces) > 0:
                 areas = []
-                for (x, y, w, h) in faces: 
+                for (x, y, w, h) in faces:
                     areas.append(w*h)
                 max_area, idx = max([(val,idx) for idx,val in enumerate(areas)])
                 face_sel = faces[idx]
-            
+
                 x = face_sel[0] * RESIZE_FACTOR
                 y = face_sel[1] * RESIZE_FACTOR
                 w = face_sel[2] * RESIZE_FACTOR
@@ -63,7 +63,7 @@ class TrainEigenFaces:
                 face = gray[y:y+h, x:x+w]
                 face_resized = cv2.resize(face, (resized_width, resized_height))
                 img_no = sorted([int(fn[:fn.find('.')]) for fn in os.listdir(self.path) if fn[0]!='.' ]+[0])[-1] + 1
-                
+
                 if self.count_timer%FREQ_DIV == 0:
                     cv2.imwrite('%s/%s.png' % (self.path, img_no), face_resized)
                     self.count_captures += 1
@@ -75,7 +75,7 @@ class TrainEigenFaces:
             print "Training data captured. Press 'q' to exit."
             self.count_captures += 1
 
-        return frame           
+        return frame
 
 
     def eigen_train_data(self):
@@ -105,4 +105,3 @@ if __name__ == '__main__':
     trainer.capture_training_images()
     trainer.eigen_train_data()
     print "Type in next user to train, or press Recognize"
-

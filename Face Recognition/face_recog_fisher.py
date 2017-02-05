@@ -10,7 +10,7 @@ class RecogFisherFaces:
         cascPath = "haarcascade_frontalface_default.xml"
         self.face_cascade = cv2.CascadeClassifier(cascPath)
         self.face_dir = 'face_data'
-        self.model = cv2.createFisherFaceRecognizer()
+        self.model = cv2.face.createFisherFaceRecognizer()
         self.face_names = []
 
     def load_trained_data(self):
@@ -47,7 +47,7 @@ class RecogFisherFaces:
                 scaleFactor=1.1,
                 minNeighbors=5,
                 minSize=(30, 30),
-                flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+                flags=cv2.CASCADE_SCALE_IMAGE
                 )
         persons = []
         for i in range(len(faces)):
